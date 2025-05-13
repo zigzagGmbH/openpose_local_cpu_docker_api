@@ -1,0 +1,78 @@
+FROM ubuntu:18.04
+
+# Set the environment to noninteractive to avoid prompts
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/London
+
+# Install dependencies without prompts
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+    apt-get install -y \
+        wget apt-utils lsb-core cmake git \
+        libopencv-dev \
+        libgflags-dev \
+        libgoogle-glog-dev \
+        libprotobuf-dev \
+        protobuf-compiler \
+        python3-dev \
+        python3-pip \
+        libboost-all-dev \
+        libhdf5-dev \
+        libhdf5-serial-dev \
+        libatlas-base-dev \
+        liblmdb-dev \
+        libleveldb-dev \
+        libsnappy-dev
+
+# Clone openpose and checkout a specific commit
+RUN git clone https://github.com/CMU-Perceptual-Computing-Lab/openpose.git
+WORKDIR /openpose
+RUN git checkout 6f0b8868bc4833b4a6156f020dd6d486dcf8a976
+
+# Modify installation scripts to remove sudo
+WORKDIR /openpose/scripts/ubuntu
+RUN sed -i 's/\<sudo -H\>//g' install_deps.sh; \
+    sed -i 's/\<sudo\>//g' install_deps.sh; \
+    sync; sleep 1;
+
+# Create model directories
+RUN mkdir -p /openpose/models/pose/body_25 \
+    /openpose/models/pose/coco \
+    /openpose/models/pose/mpi \
+    /openpose/models/face \
+    /openpose/models/hand
+
+# Configure without downloading models
+WORKDIR /openpose/build
+RUN cmake \
+    -DGPU_MODE:String=CPU_ONLY \
+    -DDOWNLOAD_BODY_25_MODEL:Bool=OFF \
+    -DDOWNLOAD_BODY_MPI_MODEL:Bool=OFF \
+    -DDOWNLOAD_BODY_COCO_MODEL:Bool=OFF \
+    -DDOWNLOAD_FACE_MODEL:Bool=OFF \
+    -DDOWNLOAD_HAND_MODEL:Bool=OFF \
+    -DUSE_MKL:Bool=OFF \
+    -DBUILD_PYTHON:Bool=ON \
+    -DPYTHON_EXECUTABLE:FILEPATH=$(which python3) \
+    -DCMAKE_BUILD_TYPE=Release \
+    ..
+
+# Build OpenPose
+RUN make -j$(nproc)
+
+# Install required Python packages for API and post-processing
+RUN pip3 install --upgrade pip setuptools wheel && \
+    pip3 install flask requests && \
+    pip3 install numpy
+
+# Copy the API server script
+COPY openpose_api_server.py /openpose/
+
+# Expose the API port
+EXPOSE 2500
+
+# Set working directory for entry point
+WORKDIR /openpose
+
+# Start the API server
+CMD ["python3", "openpose_api_server.py"]

@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  openpose-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.cpu
+    ports:
+      - "2500:2500"
+    volumes:
+      - ./models:/openpose/models
+      - ./images:/images
+    restart: unless-stopped

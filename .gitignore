@@ -1,0 +1,10 @@
+*.json
+.DS_Store
+.env
+images/outpur/*
+
+*.prototxt
+*.caffemodel
+
+.vscode/*
+.DS_Store
