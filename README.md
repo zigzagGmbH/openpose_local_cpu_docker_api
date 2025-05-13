@@ -64,7 +64,7 @@ With keypoint_scale: 3: Coordinates in JSON are normalized to [0,1] range (e.g.,
 
 docker exec open_pose_cpu_api_docker-openpose-api-1 /openpose/build/examples/openpose/openpose.bin --help | grep image
 
-# Model compatibility notes:
-# - BODY_25: Supports all features (face, hands, feet)
-# - COCO: Basic pose detection; face/hand detection may be unstable
-# - MPI: Basic pose detection; face/hand detection may be unstable
+Model compatibility notes:
+- BODY_25: Supports all features (face, hands, feet)
+- COCO: Basic pose detection; face/hand detection may be unstable
+- MPI: Basic pose detection; face/hand detection may be unstable
