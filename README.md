@@ -1,3 +1,5 @@
+# README
+
 Prep
 
 keggle instructions
@@ -68,3 +70,7 @@ Model compatibility notes:
 - BODY_25: Supports all features (face, hands, feet)
 - COCO: Basic pose detection; face/hand detection may be unstable
 - MPI: Basic pose detection; face/hand detection may be unstable
+
+## LICENSE
+
+[MIT](LICENSE)
