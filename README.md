@@ -29,29 +29,32 @@
 
 ### Models
 
-> [!Warning] Model files from original source is unavailable
+> [!Warning]
+> __Model files from original source is unavailable__
+>
 > The repository doesn't come with the models and other supporting files themselves as they are too big for github. Additionally, the models from the true source [http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/]("http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/) are also not accessible anymore.
 
+> [!Tip]
+> __But there is Good News__
+>
+> They are available in [kaggle](https://www.kaggle.com/datasets/changethetuneman/openpose-model)
 
-> [!Tip] But there is Good News
-> But they are available in [kaggle](https://www.kaggle.com/datasets/changethetuneman/openpose-model)
-
-I have made a helper script ([prep.sh](prep.sh)) to make it easy to download the models and other files and strore them in proper folder structure.
+I have made a helper script ([prep.sh](prep.sh)) to make it easy to download the models and other files and store them in proper folder structure.
 
 > [!Warning]
-But for this to work, you need to have a `kaggle account` and `kaggle cmdline tool` installed
+But for the ([prep.sh](prep.sh)) to work, you need to have a `kaggle account` and `kaggle cmdline tool` installed.
 
 #### Steps to Setup Kaggle
 
-- Go to [kaggle.com](https://www.kaggle.com) and create an account, verify your account and create an `API_KEY`. Don;t worry it's free.
+- Go to [kaggle.com](https://www.kaggle.com) and create an account, verify your account and create an `API_KEY`. Don't worry it's free.
 - After creating the `API_KEY` you will have to donwload the `kaggle.json` to a suitable location.
 - Then do `mkdir -p ~/.kaggle` and copy the `kaggle.json` there.
 - For example, if you downloaded it in your `Downloads/` directory then simply to `mv <PATH TO DOWNLOADS DIRECTORY>/kaggle.json ~/.kaggle` and verify by typing `ls ~/.kaggle`.
-- This is needs to be done because `kaggle cmdline tool` looks for API credentials in PATH `~/.kaggle/kaggle.json`
+- This needs to be done because `kaggle cmdline tool` looks for API credentials in PATH `~/.kaggle/kaggle.json`
 - Now install `kaggle cmdline tool` by typing: `python3 -m pip install kaggle` or `pip install kaggle`.
-- Kaggle setup shoudl be done. You can verify typing: `kaggle datasets files changethetuneman/openpose-model`
+- Kaggle setup should be done now. You can verify by typing: `kaggle datasets files changethetuneman/openpose-model`
 
-#### Steps to Setup Expected Directories and Download Models and Other Files
+#### Steps to Setup Expected Directories and Download Models and Other Files In Them
 
 ```bash
 $ git clone git@github.com:zigzagGmbH/openpose_local_cpu_docker_api.git
@@ -87,22 +90,41 @@ After completion, it should look liek this
 
 ### Docker
 
-Well make sure your docker and docker-cli is insatlled and up and running. You might also need to loginto your docker a/c first.
+Well, make sure your docker and docker-cli is insatlled and up and running. You might also need to loginto your docker a/c first.
 
+## Installation
 
-docker run -it --rm \
-  -v $(pwd)/models:/openpose/models \
-  -v $(pwd)/images:/images \
-  openpose-cpu \
-  ./build/examples/openpose/openpose.bin --image_dir /images --write_images /images/output --display 0
+Make the docker image
 
+```bash
+# --> Login (Probably needed)
+# docker login
 
+# --> Check the Linux Image (Probably needed)
+# docker pull ubuntu:18.04
 
-  {
-  "image_path": "/images/test.jpg",
-  "output_dir": "/images/output"
-}
+# Start
+COMPOSE_BAKE=true docker-compose up --build -d
+# First time it will takle some time as it is creating a fresh image
 
+# Check it ...
+docker-compose ps
+docker ps
+
+# Now openpose should be compiled ...
+# Test  
+docker exec openpose_local_cpu_docker_api-openpose-api-1 /openpose/build/examples/openpose/openpose.bin --help
+# If that works i.e. if you see a bunch of help dump, try an inference
+docker exec openpose_local_cpu_docker_api-openpose-api-1 /openpose/build/examples/openpose/openpose.bin --image_dir /images --write_images /images/output/ --display 0 
+
+# Stop
+docker-compose down
+```
+
+### Additional CMDs
+
+```bash
+```
 
 {
   "image_path": "/images/test.jpg",           // Required: Path to image within container
@@ -131,14 +153,6 @@ docker run -it --rm \
                                               // 0=original resolution, 3=normalized [0,1], 4=normalized [-1,1]
 }
 
-
-docker-compose down
-
-COMPOSE_BAKE=true docker-compose up --build -d
-
-docker-compose ps
-docker ps
-logs openpose-api
 
 
 The keypoint_scale parameter only affects the JSON output, not the rendered images. That's why you're not seeing visual differences.
