@@ -1,5 +1,32 @@
 # README
 
+## Inspiration & Reason
+
+- I wanted to have a separte effort to see if I can run openpose loaclly on my __mac__.
+- I was inspired by the [online openposeai viz](https://openposeai.com/?lng=en) but wanted something where I can use a webcam to take a snapshot and get opnepose skeleton back - a humble wish.
+- But after spending a full day almost to try to compile `openpose` on my `mac M3` chip and dealing with outdated instructions and code base I was almost about to give up.
+- But then I thought probably someone ported it via `docker` and for `ubuntu` (where it's supposed to compile easily) and even better, for `cpu` and not ~~`CUDA`~~
+
+## What It Tries to Solve
+
+- This project creates a `cpu` only openpose image in `Ubuntu 18` so that we can run it form `macOS`.
+- This then exposes 3 API end points:
+  - `/process` (`POST` req): Takes an image (and few other parameters - more on those below) processes it using one of the 3 openpose models (`BODY_25`, `COCO`, `MPI`) and gives us `openpose` skeleton data (images and json)
+  - `/stop` (`POST`): Stops a running job
+  - `/status` (`GET`): Gives us some ongoing staus
+- This way we __do not have to deal with__ the aforementioned issues on `macOS`, especially.
+- And any language agnostic client, capable of `HTTP` can send image and recveive openpose data
+
+## What It Doesn't Do
+
+- This project currently doesn't support realtime video streams as `x11` forwarding on `macOS` was bit of an issue.
+- This project currently doesn't support video file (from disk) analysis. Although if needed we can think about it. But I wanted a simple solution first.
+- 
+
+Note: there are other projects ...
+
+---
+
 Prep
 
 keggle instructions
@@ -71,6 +98,13 @@ Model compatibility notes:
 - COCO: Basic pose detection; face/hand detection may be unstable
 - MPI: Basic pose detection; face/hand detection may be unstable
 
+---
+
 ## LICENSE
 
 [MIT](LICENSE)
+
+## Attribution
+
+- [openpose (original)](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
+- [docker-openpose-cpu](https://github.com/seancook/docker-openpose-cpu/)

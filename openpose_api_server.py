@@ -50,6 +50,14 @@ def monitor_output(pipe, progress_markers):
         if not line:
             continue
 
+        # Skip OpenPose warning messages about CUDA vs CPU accuracy
+        if "WARNING" in line and "CUDA version" in line:
+            continue
+        if "--------------------------------" in line:
+            continue
+        if "accuracy boost is almost insignificant" in line:
+            continue
+
         update_status(line.strip(), None)
 
         # More specific progress markers
