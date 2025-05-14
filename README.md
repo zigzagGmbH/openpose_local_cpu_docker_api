@@ -20,18 +20,74 @@
 ## What It Doesn't Do
 
 - This project currently doesn't support realtime video streams as `x11` forwarding on `macOS` was bit of an issue.
-- This project currently doesn't support video file (from disk) analysis. Although if needed we can think about it. But I wanted a simple solution first.
-- 
+- This project currently doesn't support analysis of video file from disk. Although if needed we can think about it. But I wanted a simple solution first.
 
-Note: there are other projects ...
+> [!Tip]
+> If you are interetsed in something alternative to openpose, you can chekout other projects such as [super-gradients with YOLO](https://github.com/Deci-AI/super-gradients/). But I just got stuck with openpose and this is waht we did here.
 
----
+## Prerequisites
 
-Prep
+### Models
 
-keggle instructions
+> [!Warning] Model files from original source is unavailable
+> The repository doesn't come with the models and other supporting files themselves as they are too big for github. Additionally, the models from the true source [http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/]("http://posefs1.perception.cs.cmu.edu/OpenPose/models/pose/) are also not accessible anymore.
 
-notes for future curls if things change
+
+> [!Tip] But there is Good News
+> But they are available in [kaggle](https://www.kaggle.com/datasets/changethetuneman/openpose-model)
+
+I have made a helper script ([prep.sh](prep.sh)) to make it easy to download the models and other files and strore them in proper folder structure.
+
+> [!Warning]
+But for this to work, you need to have a `kaggle account` and `kaggle cmdline tool` installed
+
+#### Steps to Setup Kaggle
+
+- Go to [kaggle.com](https://www.kaggle.com) and create an account, verify your account and create an `API_KEY`. Don;t worry it's free.
+- After creating the `API_KEY` you will have to donwload the `kaggle.json` to a suitable location.
+- Then do `mkdir -p ~/.kaggle` and copy the `kaggle.json` there.
+- For example, if you downloaded it in your `Downloads/` directory then simply to `mv <PATH TO DOWNLOADS DIRECTORY>/kaggle.json ~/.kaggle` and verify by typing `ls ~/.kaggle`.
+- This is needs to be done because `kaggle cmdline tool` looks for API credentials in PATH `~/.kaggle/kaggle.json`
+- Now install `kaggle cmdline tool` by typing: `python3 -m pip install kaggle` or `pip install kaggle`.
+- Kaggle setup shoudl be done. You can verify typing: `kaggle datasets files changethetuneman/openpose-model`
+
+#### Steps to Setup Expected Directories and Download Models and Other Files
+
+```bash
+$ git clone git@github.com:zigzagGmbH/openpose_local_cpu_docker_api.git
+$ cd openpose_local_cpu_docker_api
+$ ./pre.sh
+```
+
+It will then prepare the [models/](models) dir and download all the necessary files in required sub-dirtectories
+
+After completion, it should look liek this
+
+```txt
+├── models
+│   ├── face
+│   │   ├── pose_deploy.prototxt
+│   │   └── pose_iter_116000.caffemodel
+│   ├── hand
+│   │   ├── pose_deploy.prototxt
+│   │   └── pose_iter_102000.caffemodel
+│   └── pose
+│       ├── body_25
+│       │   ├── pose_deploy_linevec_faster_4_stages.prototxt
+│       │   ├── pose_deploy_linevec.prototxt
+│       │   ├── pose_deploy.prototxt
+│       │   └── pose_iter_584000.caffemodel
+│       ├── coco
+│       │   ├── pose_deploy_linevec.prototxt
+│       │   └── pose_iter_440000.caffemodel
+│       └── mpi
+│           ├── pose_deploy_linevec.prototxt
+│           └── pose_iter_160000.caffemodel
+```
+
+### Docker
+
+Well make sure your docker and docker-cli is insatlled and up and running. You might also need to loginto your docker a/c first.
 
 
 docker run -it --rm \
