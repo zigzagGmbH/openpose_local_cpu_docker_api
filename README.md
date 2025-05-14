@@ -179,7 +179,7 @@ EXPECTED RESPONSE:
     "current_image": null,
     "is_processing": true,
     "progress": 0,
-    "status_message": "Starting to process image: /images/test_feet_1.jpg"
+    "status_message": "Starting to process image: /images/test.jpg"
   },
   "success": true
 }
@@ -201,7 +201,7 @@ EXPECTED RESPONSE:
 {
   "message": "Processing stopped",
   "status": {
-    "current_image": "/images/test_feet_1.jpg",
+    "current_image": "/images/test.jpg",
     "is_processing": false,
     "progress": 100,
     "status_message": "Processing stopped by user"
@@ -237,7 +237,7 @@ EXPECTED RESPONSE:
 
 ```json
 {
-  "current_image": "/images/test_feet_1.jpg",
+  "current_image": "/images/test.jpg",
   "estimated_completion": "JSON output complete, finalizing processing...",
   "is_processing": true,
   "keypoint_stats": {
@@ -249,13 +249,13 @@ EXPECTED RESPONSE:
   },
   "outputs": {
     "json": [
-      "/images/output/json/test_feet_1_keypoints.json"
+      "/images/output/json/test_keypoints.json"
     ],
     "rendered_on_black": [
-      "/images/output/black_bg/test_feet_1_rendered.png"
+      "/images/output/black_bg/test_rendered.png"
     ],
     "rendered_on_image": [
-      "/images/output/on_image/test_feet_1_rendered.png"
+      "/images/output/on_image/test_rendered.png"
     ]
   },
   "progress": 30,
@@ -267,7 +267,7 @@ EXPECTED RESPONSE:
 
 ```json
 {
-  "current_image": "/images/test_feet_1.jpg",
+  "current_image": "/images/test.jpg",
   "is_processing": false,
   "keypoint_stats": {
     "has_face_keypoints": true,
@@ -278,13 +278,13 @@ EXPECTED RESPONSE:
   },
   "outputs": {
     "json": [
-      "/images/output/json/test_feet_1_keypoints.json"
+      "/images/output/json/test_keypoints.json"
     ],
     "rendered_on_black": [
-      "/images/output/black_bg/test_feet_1_rendered.png"
+      "/images/output/black_bg/test_rendered.png"
     ],
     "rendered_on_image": [
-      "/images/output/on_image/test_feet_1_rendered.png"
+      "/images/output/on_image/test_rendered.png"
     ]
   },
   "progress": 100,
@@ -294,6 +294,9 @@ EXPECTED RESPONSE:
 
 ### Undserstanding
 
+Various option available to you as part of the `BODY` for the `/process` end-point of the `POST` request
+
+```json
 {
   "image_path": "/images/test.jpg",           // Required: Path to image within container
   "output_dir": "/images/output",             // Optional: Output directory (default: /images/output)
@@ -320,21 +323,39 @@ EXPECTED RESPONSE:
   "keypoint_scale": 0                         // Optional: Coordinate scale in JSON output (default: 0)
                                               // 0=original resolution, 3=normalized [0,1], 4=normalized [-1,1]
 }
+```
+
+The `keypoint_scale` parameter only affects the JSON output, not the rendered images. That's why you'll not see visual differences.
+
+- With keypoint_scale: 0: Coordinates in JSON are in pixel values (e.g., x: 320, y: 240)
+- With keypoint_scale: 3: Coordinates in JSON are normalized to [0,1] range (e.g., x: 0.33, y: 0.45)
+
+### Model Compatibility Notes
+
+- `BODY_25`: Supports all features (face, hands, feet)
+- `COCO`: Basic pose detection; face/hand detection may be unstable
+- `MPI`: Basic pose detection; face/hand detection may be unstable
+
+So if we send a `BODY` as follows
+
+```json
+{
+  "image_path": "/images/test.jpg",
+  "output_dir": "/images/output",
+  "model": "BODY_25", 
+  "detect_face": true,                       
+  "detect_hands": true,                     
+  "detect_feet": true,                      
+}
+```
+
+Then we would see output as such
+
+| source image| rendered on image | just skeleton |
+| --- | --- | -- |
+| ![alt text](assets/test_feet_1.jpg) | ![alt text](<assets/test_feet_1_rendered 2.png>) | ![alt text](assets/test_feet_1_rendered.png) |
 
 
-
-The keypoint_scale parameter only affects the JSON output, not the rendered images. That's why you're not seeing visual differences.
-
-With keypoint_scale: 0: Coordinates in JSON are in pixel values (e.g., x: 320, y: 240)
-With keypoint_scale: 3: Coordinates in JSON are normalized to [0,1] range (e.g., x: 0.33, y: 0.45)
-
-
-docker exec open_pose_cpu_api_docker-openpose-api-1 /openpose/build/examples/openpose/openpose.bin --help | grep image
-
-Model compatibility notes:
-- BODY_25: Supports all features (face, hands, feet)
-- COCO: Basic pose detection; face/hand detection may be unstable
-- MPI: Basic pose detection; face/hand detection may be unstable
 
 ---
 
