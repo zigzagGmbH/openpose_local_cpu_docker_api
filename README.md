@@ -333,8 +333,8 @@ The `keypoint_scale` parameter only affects the JSON output, not the rendered im
 ### Model Compatibility Notes
 
 - `BODY_25`: Supports all features (face, hands, feet)
-- `COCO`: Basic pose detection; face/hand detection may be unstable
-- `MPI`: Basic pose detection; face/hand detection may be unstable
+- `COCO`: Basic pose detection; face/hand detection are not available
+- `MPI`: Basic pose detection; face/hand detection are not available
 
 So if we send a `BODY` as follows
 
@@ -354,8 +354,6 @@ Then we would see output as such
 | source image| rendered on image | just skeleton |
 | --- | --- | -- |
 | ![alt text](assets/test_feet_1.jpg) | ![alt text](<assets/test_feet_1_rendered 2.png>) | ![alt text](assets/test_feet_1_rendered.png) |
-
-
 
 ---
 
