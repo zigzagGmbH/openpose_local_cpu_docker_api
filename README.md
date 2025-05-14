@@ -1,5 +1,7 @@
 # README
 
+![alt text](assets/openpose_docker_api_diag.png)
+
 ## Inspiration & Reason
 
 - I wanted to have a separte effort to see if I can run openpose loaclly on my __mac__.
