@@ -121,10 +121,178 @@ docker exec openpose_local_cpu_docker_api-openpose-api-1 /openpose/build/example
 docker-compose down
 ```
 
-### Additional CMDs
+> [!Tip]
+> When the docker image is running, you can check the log files by typing
 
 ```bash
+docker logs -f open_pose_cpu_api_docker-openpose-api-1
 ```
+
+## Usage
+
+What the above compose cmd does is that when the docker image is running it uses [openpose_api_server.py](openpose_api_server.py) which watches for `HTTP` requestes and for specific `GET`/`POST` requests, it then runs/stops the compiled `openpose.bin` file execution or reports execution status.
+
+> [!Tip]
+> For the next steps I highly suggest installing [httpie](https://httpie.io/) although you can check HTTP APIs via CURL directly from cmdline
+
+### Sending a post request to our openpose docker image API
+
+METHOD:
+
+`POST`
+
+URL:
+
+`http://127.0.0.1:2500/process`
+
+BODY:
+
+> Basic example
+
+```json
+{
+  "image_path": "/images/test.jpg",
+  "output_dir": "/images/output"
+}
+```
+
+EXPECTED RESPONSE:
+
+```json
+{
+  "message": "Image processing started",
+  "options": {
+    "detect_face": false,
+    "detect_feet": false,
+    "detect_hands": false,
+    "face_render_threshold": 0.4,
+    "feet_render_threshold": 0.03,
+    "hand_render_threshold": 0.2,
+    "keypoint_scale": 0,
+    "model": "BODY_25",
+    "render_on_black": true,
+    "render_on_image": true,
+    "render_threshold": 0.05,
+    "write_json": true
+  },
+  "status": {
+    "current_image": null,
+    "is_processing": true,
+    "progress": 0,
+    "status_message": "Starting to process image: /images/test_feet_1.jpg"
+  },
+  "success": true
+}
+```
+
+### Stopping an ongoing process
+
+METHOD:
+
+`POST`
+
+URL:
+
+`http://127.0.0.1:2500/stop`
+
+EXPECTED RESPONSE:
+
+```json
+{
+  "message": "Processing stopped",
+  "status": {
+    "current_image": "/images/test_feet_1.jpg",
+    "is_processing": false,
+    "progress": 100,
+    "status_message": "Processing stopped by user"
+  },
+  "success": true
+}
+```
+
+### Status of an ongoing process
+
+METHOD:
+
+`GET`
+
+URL:
+
+`http://127.0.0.1:2500/status`
+
+EXPECTED RESPONSE:
+
+1. Idle
+
+```json
+{
+  "current_image": null,
+  "is_processing": false,
+  "progress": 0,
+  "status_message": "Idle"
+}
+```
+
+2. Process ongoing
+
+```json
+{
+  "current_image": "/images/test_feet_1.jpg",
+  "estimated_completion": "JSON output complete, finalizing processing...",
+  "is_processing": true,
+  "keypoint_stats": {
+    "has_face_keypoints": true,
+    "has_feet_keypoints": true,
+    "has_hand_keypoints": false,
+    "model_used": "BODY_25",
+    "num_people_detected": 1
+  },
+  "outputs": {
+    "json": [
+      "/images/output/json/test_feet_1_keypoints.json"
+    ],
+    "rendered_on_black": [
+      "/images/output/black_bg/test_feet_1_rendered.png"
+    ],
+    "rendered_on_image": [
+      "/images/output/on_image/test_feet_1_rendered.png"
+    ]
+  },
+  "progress": 30,
+  "status_message": "Starting thread(s)..."
+}
+```
+
+3. Job stopped
+
+```json
+{
+  "current_image": "/images/test_feet_1.jpg",
+  "is_processing": false,
+  "keypoint_stats": {
+    "has_face_keypoints": true,
+    "has_feet_keypoints": true,
+    "has_hand_keypoints": false,
+    "model_used": "BODY_25",
+    "num_people_detected": 1
+  },
+  "outputs": {
+    "json": [
+      "/images/output/json/test_feet_1_keypoints.json"
+    ],
+    "rendered_on_black": [
+      "/images/output/black_bg/test_feet_1_rendered.png"
+    ],
+    "rendered_on_image": [
+      "/images/output/on_image/test_feet_1_rendered.png"
+    ]
+  },
+  "progress": 100,
+  "status_message": "Processing stopped by user"
+}
+```
+
+### Undserstanding
 
 {
   "image_path": "/images/test.jpg",           // Required: Path to image within container
