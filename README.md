@@ -296,7 +296,7 @@ EXPECTED RESPONSE:
 
 Various option available to you as part of the `BODY` for the `/process` end-point of the `POST` request
 
-```json
+```
 {
   "image_path": "/images/test.jpg",           // Required: Path to image within container
   "output_dir": "/images/output",             // Optional: Output directory (default: /images/output)
